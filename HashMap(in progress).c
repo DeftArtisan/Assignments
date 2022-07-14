@@ -32,7 +32,7 @@ typedef struct HashMap{
 } HashMap;
 
 void allocation(struct HashMap* initial, _MSIZE_* inefficient) {
-   assert((initial && inefficient) != NULL);
+   assert(initial != NULL);
    initial->localization = (_MATRICE_) malloc(sizeof(_MNORM_) * initial->size);
    for (int i = 0; i < initial->size; ++i)
       *(initial->localization + i) = (_MNORM_) malloc(sizeof(char) * initial->size); //fix the dereferencing of the struct field
@@ -53,8 +53,8 @@ int sort_facility (const void * a, const void * b) {
    return ( *(char*)a - *(char*)b );
 }
 
-bool evaluation_of_boundary( const _MNORM_* evaluator,  _MNORM_* auxiliary, _MSIZE_* boundary){
-    assert((evaluator && auxiliary) != NULL);
+bool evaluation_of_boundary( _MNORM_* evaluator,  _MNORM_* auxiliary, _MSIZE_* boundary){
+    assert(evaluator != NULL);
     for (int i = 0; i < INT_MAX; ++i){
         if((int) *(evaluator + i) == 0){
             *(boundary) = i;
@@ -98,7 +98,7 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
             }
 
             if(isAllowable)
-                indexationFinalized = (_MNORM_) malloc(sizeof(char) * *(indexesOfMValues + f)); //creating
+                *(indexationFinalized + f) = (_MNORM_) malloc(sizeof(char) * *(indexesOfMValues + f)); //creating
            }
 
 
@@ -111,49 +111,49 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
                    }
                    if((int) *(*(recep->localization + l) + 1) > (int) *(*(recep->localization + i) + 1) ||
                       (int) *(*(recep->localization + l) + 1) == (int) *(*(recep->localization + i) + 1)){ //if equality encountered enter an infinite loop for a progressive evaluation
-                      
-                      if((int) *(*(recep->localization + l) + 1) == (int) *(*(recep->localization + l++) + 1)) {
+
+                      if((int) *(*(recep->localization + l) + 1) == (int) *(*(recep->localization + i) + 1)) {
                           register _MSIZE_ counter = 1;
                           _MSIZE_ boundary = 0;
                             //make a method for the determination of a boundary when using counter(preventative of exceeding array bounds, cap to the limiting column)
-                            if(evaluation_of_boundary(*(recep->localization + l), *(recep->localization + i), &boundary))){
-                               while(counter <= boundary && (int) *(*(recep->localization + l) + counter) == (int) *(*(recep->localization + l++) + counter)){ //until non-equality encountered
-                                   if((int) *(*(recep->localization + l) + counter) > (int) *(*(recep->localization + l++) + counter)) {
+                            if(evaluation_of_boundary(&(*(recep->localization + l)), &(*(recep->localization + i)), &boundary)){
+                               while(counter <= boundary && (int) *(*(recep->localization + l) + counter) == (int) *(*(recep->localization + i) + counter)){ //until non-equality encountered
+                                   if((int) *(*(recep->localization + l) + counter) > (int) *(*(recep->localization + i) + counter)) {
                                       *(*(indexationFinalized + l) + 1) += 1;
                                        break;
                                  }
                                 counter++;
                             }
                           } else {
-                                 while(counter <= boundary && (int) *(*(recep->localization + l) + counter) == (int) *(*(recep->localization + l++) + counter){ //until non-equality encountered
-                                   if((int) *(*(recep->localization + l) + counter) > (int) *(*(recep->localization + l++) + counter) {
+                                 while(counter <= boundary && (int) *(*(recep->localization + l) + counter) == (int) *(*(recep->localization + i) + counter)){ //until non-equality encountered
+                                   if((int) *(*(recep->localization + l) + counter) > (int) *(*(recep->localization + i) + counter)) {
                                       *(*(indexationFinalized + l) + 1) += 1;
                                        break;
-                                 }
+                                   }
                                 counter++;
                             }
-                            
+
                           }
 
                       element++;
                       *(*(indexationFinalized + l) + 0) = l;
                       *(*(indexationFinalized + l) + 1) = element;
                    }
-                   
+
                    continue;
                }
             }
         }
     }
-    
-    _MSIZE_ sortage = (_MSIZE_) malloc(sizeof(char) * recep->size);
+
+       _MNORM_ sortage = (_MNORM_) malloc(sizeof(char) * recep->size);
 
         //replace with an integrated method for array-copying
         for (size_t a = 0; a < recep->size; ++a){
             *(sortage + a) = *(*(indexationFinalized + a) + 1);
         }
         //qsort(sortage, recep->size, sort_facility());//verify parameter-
-        
+
         for (size_t s = 0; s < recep->size; ++s){
              for (size_t f = 0; f < recep->size; ++f){
                 if((*(*recep->localization + f) + 0) == *(sortage + s)){
@@ -161,13 +161,12 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
                 }
              }
         }
-    
+
  }
    return true;
 }
 
 _MATRICE_ _CLONED(struct HashMap* initial) {
-     _MNORM_ recep = (_MNORM_) malloc(sizeof(char) * initial->size);
      return (_MATRICE_) malloc(sizeof(_MNORM_) * initial->size);
 }
 
@@ -176,6 +175,7 @@ void sort_by_value(struct HashMap* initial, enum Sort sortage) {
     switch(sortage) {
     case 1:
         initial->localization = _CLONED(initial);
+        break;
     default:
         perror(INVALID_SORT_TYPE);
     }
@@ -187,33 +187,34 @@ void put_by_natural(struct HashMap* initial, _MNORM_ exemplify, _MNORM_ deficien
 
    while(true) {
       for(int i = 0; i < initial->size; ++i){
-        if(initial->localization[i][0] == 0) {
-            FINM = i;
+        if(*(*(initial->localization + i) + 1) == 0) {
+        	FINM = i;
             break;
         }
       }
    }
 
    if(deficient != NULL) {
-       /initial->*(*(localization + initial->size) + 
+       //initial->*(*(localization + initial->size) +
        switch((int) *(*(initial->localization + initial->size) + 0)){
         case '0':
-             initial->localization[0][0] = (_MNORM_) malloc(sizeof(char) * sizeof(deficient));
+             *(initial->localization) = (_MNORM_) malloc(sizeof(char) * 5);
              initial->size++;
             goto finalize;
        default:
              initial->localization = (_MATRICE_) realloc(initial->localization, initial->size + 1);
-             initial->localization[0][0] = (_MNORM_) malloc(sizeof(char) * sizeof(deficient));
+             *(initial->localization) = (_MNORM_) malloc(sizeof(char) * 5);
              initial->size++;
              goto finalize;
       }
 
    }
+
+   size_t SZ;
     finalize:
-        size_t SZ;
         for (int f = 0; f < LONG_LONG_MAX; ++f) {
             if(*(deficient + f) == 0){
-                SZ = f - 1;
+            	SZ = (size_t) f - 1;
                 break;
             }
         }
@@ -226,5 +227,6 @@ void put_by_natural(struct HashMap* initial, _MNORM_ exemplify, _MNORM_ deficien
 }
 int main()
 {
+	printf("activity");
     return 0;
 }
