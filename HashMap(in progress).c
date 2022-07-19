@@ -11,7 +11,7 @@
 #define _MNORM_ char*
 #define _MSIZE_ unsigned int
 #define EXECUTIVE_FINALIZE(X) printf("%c", X);
-
+#define _SERIOSITY_ int = 0xFF; //hexadecimal constant definition 
 
 
 const char* INVALID_SORT_TYPE = "Invalid sort type";
@@ -57,10 +57,10 @@ bool evaluation_of_boundary( _MNORM_* evaluator,  _MNORM_* auxiliary, _MSIZE_* b
     assert(evaluator != NULL);
     for (int i = 0; i < INT_MAX; ++i){
         if((int) *(evaluator + i) == 0){
-            *(boundary) = i;
-            for (int g = 0; g < i; ++g) {
+            *boundary = i;
+            for (int g = 0; g < *boundary; ++g) {
                 if((int) *(auxiliary + g) == 0){
-                    *(boundary) = g;
+                    *boundary = g;
                     return true;
                 }
             }
@@ -69,6 +69,9 @@ bool evaluation_of_boundary( _MNORM_* evaluator,  _MNORM_* auxiliary, _MSIZE_* b
     return false;
 }
 
+
+
+
 //facility algorithm
 //extraction of elements' precedence through inter-comparisons implemented by associating each element with his sorted position(count of elements which are lower++) with a map(matrice)
 //in the case of precedence indecision(equalized elements) enter an infinite loop for inter-comparison of each element's subsequent characters(if indecisive, retain input order)
@@ -76,9 +79,10 @@ bool evaluation_of_boundary( _MNORM_* evaluator,  _MNORM_* auxiliary, _MSIZE_* b
 
 bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
     _MATRICE_ indexationFinalized = (_MATRICE_)malloc(sizeof(_MNORM_) * recep->size);//each row represents the associative key, each 1st el of col representative of sorted position
+   //the aforementioned receptacle is redundantly over-allocated since its usage is appropriated and restricted for identification and algorithmically determined position by value alongside 
     _MNORM_ indexesOfMValues = (_MNORM_)malloc(sizeof(char) * recep->size);
      bool isAllowable = false;
-    _MSIZE_ element = 0;
+    _MSIZE_ element = 0;//counter for a specific key property of the map wherein the ascending ordered position is determined by the aforementioned sorting algorithm
 
     while(true) {
         for (int f = 0; f < recep->size; ++f){
@@ -86,7 +90,7 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
                 for (int g = 0; g < INT_MAX; ++g){
                 if(*(*(recep->localization + f) + g) == '0'){   //getting the sizes of each value prior to clone-reallocation
                     *(indexesOfMValues + f) = g;
-                    *executive = g;
+                    *executive = g;//useless
                     break;
                   }
                }
@@ -97,7 +101,7 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
                 isAllowable = true;
             }
 
-            if(isAllowable)
+            if(isAllowable){
                 *(indexationFinalized + f) = (_MNORM_) malloc(sizeof(char) * *(indexesOfMValues + f)); //creating
            }
 
@@ -112,7 +116,7 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
                    if((int) *(*(recep->localization + l) + 1) > (int) *(*(recep->localization + i) + 1) ||
                       (int) *(*(recep->localization + l) + 1) == (int) *(*(recep->localization + i) + 1)){ //if equality encountered enter an infinite loop for a progressive evaluation
 
-                      if((int) *(*(recep->localization + l) + 1) == (int) *(*(recep->localization + i) + 1)) {
+                      if((int) *(*(recep->localization + l) + 1) == (int) *(*(recep->localization + i) + 1)) {//superfluously extending if statements could be reduced to if/else of the parental statement
                           register _MSIZE_ counter = 1;
                           _MSIZE_ boundary = 0;
                             //make a method for the determination of a boundary when using counter(preventative of exceeding array bounds, cap to the limiting column)
@@ -132,12 +136,11 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
                                    }
                                 counter++;
                             }
-
                           }
 
                       element++;
-                      *(*(indexationFinalized + l) + 0) = l;
-                      *(*(indexationFinalized + l) + 1) = element;
+                      *(*(indexationFinalized + l) + 0) = l;//key
+                      *(*(indexationFinalized + l) + 1) = element;//position
                    }
 
                    continue;
@@ -145,22 +148,39 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
             }
         }
     }
-
-       _MNORM_ sortage = (_MNORM_) malloc(sizeof(char) * recep->size);
-
-        //replace with an integrated method for array-copying
-        for (size_t a = 0; a < recep->size; ++a){
-            *(sortage + a) = *(*(indexationFinalized + a) + 1);
-        }
-        //qsort(sortage, recep->size, sort_facility());//verify parameter-
-
+      
+       
         for (size_t s = 0; s < recep->size; ++s){
              for (size_t f = 0; f < recep->size; ++f){
-                if((*(*recep->localization + f) + 0) == *(sortage + s)){
-                    //creating of a new matrix receptacle
-                }
+                if((*(*recep->localization + f) + 0) == *(*(indexationFinalized + s) + 0)){
+                	if(f == *(*(indexationFinalized + s) + 1))
+                		continue;
+                	register char _key;
+                	_key = (s == 0) ? *(*(indexationFinalized + s) + 0) : '0';
+                	//avoidance of pseudo-randomness due to sequentiality immediately fill the space 
+                    //the first one is sequentially not stored accordingly to designated space in order to not vitiate the immediateness of the empty space infusion, and is to be filled in the remaining unfilled space
+                	//
+                	
+                	_MNORM_ curr = (_MNORM_)malloc(sizeof(char) * *(indexesOfMValues + (int) *(*(indexationFinalized + s) + 0)));//getting the value prior to it being repopulated
+                	
+                   *(recep->localization + (int) *(*(indexationFinalized + s) + 1)) = (_MNORM_) 
+                		   realloc(*(recep->localization + (int) *(*(indexationFinalized + s) + 1)), *(indexesOfMValues + f) * sizeof(char));
+                   //creation of the receptacle 
+                   *(recep->localization + (int) *(*(indexationFinalized + s) + 1)) = *(recep->localization + f);//replacement after reallocation 
+
+                   for (size_t g = 0; g < recep->size; ++g){
+                	   if(_key == (*(*recep->localization + g) + 0)){
+                		   for (size_t g = 0; g < recep->size; ++g){
+                			   *(recep->localization + g) = (_MNORM_) realloc((*recep->localization + g), *(indexesOfMValues + g) * sizeof(char));
+                		   }
+                	   }
+                   }
+                }  
+                
              }
         }
+        
+        break;
 
  }
    return true;
