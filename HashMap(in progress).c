@@ -7,15 +7,17 @@
 #include <limits.h>
 #include <string.h>
 
+
 #define _MATRICE_ char**
 #define _MNORM_ char*
 #define _MSIZE_ unsigned int
 #define EXECUTIVE_FINALIZE(X) printf("%c", X);
-#define _SERIOSITY_ int = 0xFF; //hexadecimal constant definition 
+#define _SERIOSITY_ int = 0xFF; //hexadecimal constant definition
 
 
 const char* INVALID_SORT_TYPE = "Invalid sort type";
 const char* DUPLICATION_KEY = "Duplicate key";
+
 
 
 typedef enum Sort{
@@ -79,7 +81,7 @@ bool evaluation_of_boundary( _MNORM_* evaluator,  _MNORM_* auxiliary, _MSIZE_* b
 
 bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
     _MATRICE_ indexationFinalized = (_MATRICE_)malloc(sizeof(_MNORM_) * recep->size);//each row represents the associative key, each 1st el of col representative of sorted position
-   //the aforementioned receptacle is redundantly over-allocated since its usage is appropriated and restricted for identification and algorithmically determined position by value alongside 
+   //the aforementioned receptacle is redundantly over-allocated since its usage is appropriated and restricted for identification and algorithmically determined position by value alongside
     _MNORM_ indexesOfMValues = (_MNORM_)malloc(sizeof(char) * recep->size);
      bool isAllowable = false;
     _MSIZE_ element = 0;//counter for a specific key property of the map wherein the ascending ordered position is determined by the aforementioned sorting algorithm
@@ -148,10 +150,40 @@ bool _FACILITY_(_MATRICE_* clone, struct HashMap* recep, int* executive) {
             }
         }
     }
-      
-       
+
+       _MNORM_ curr = NULL;
+
+        for (size_t s = 0; s < recep->size; ++s){
+             for (size_t f = 0; f < recep->size; ++f){
+                if((*(*recep->localization + f) + 0) == *(*(indexationFinalized + s) + 0)){
+                	if(f == *(*(indexationFinalized + s) + 1))
+                		continue;
+                	register char _key;//key for the currently replaced value
+                	_key = (s == 0) ? *(*(indexationFinalized + s) + 0) : '0';
+                	//avoidance of pseudo-randomness due to sequentiality immediately fill the space
+                    //the first one is sequentially not stored accordingly to designated space in order to not vitiate the immediateness of the empty space infusion, and is to be filled in the remaining unfilled space
+                	//
+
+                	_MNORM_ curr = (_MNORM_)malloc(sizeof(char) * *(indexesOfMValues + (int) *(*(indexationFinalized + s) + 0)));//getting the value prior to it being repopulated
+
+                   *(recep->localization + (int) *(*(indexationFinalized + s) + 1)) = (_MNORM_)
+                		   realloc(*(recep->localization + (int) *(*(indexationFinalized + s) + 1)), *(indexesOfMValues + f) * sizeof(char));
+                   //creation of the receptacle
+                   *(recep->localization + (int) *(*(indexationFinalized + s) + 1)) = *(recep->localization + f);//replacement after reallocation
+
+                   for (size_t g = 0; g < recep->size; ++g){
+                	   if(*(*(indexationFinalized + g) + 1) == f){
+                               *(recep->localization + f) = (_MNORM_) realloc((*recep->localization + f), *(indexesOfMValues + f) * sizeof(char));
+                       }
+                   }
+                }
+
+             }
+
+             if(s == recep->size--)
+            	 return false; //redact and put curr
         }
-        
+
         break;
 
  }
@@ -220,5 +252,5 @@ void put_by_natural(struct HashMap* initial, _MNORM_ exemplify, _MNORM_ deficien
 int main()
 {
 	printf("activity");
-    return 0;
+    return EXIT_SUCCESS;
 }
